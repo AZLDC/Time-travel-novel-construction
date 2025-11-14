@@ -1,0 +1,6 @@
+{
+  "input_path": "D:/interest/output/0/input.png",
+  "output_dir": "D:/interest/output",
+  "mc_resolution": 512,
+  "bake_texture": true
+}

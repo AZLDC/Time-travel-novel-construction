@@ -20,10 +20,41 @@ def run(cmd: list[str]) -> int:
     return subprocess.call(cmd)
 
 
+def patch_requirements() -> None:
+    """調整上游 TripoSR 的 requirements.txt，避免不相容的版本限制。
+
+    目前主要處理：
+    - 若存在 transformers==4.35.0，改為 transformers>=4.39.0，
+      以避免拉到需要 Rust/Cargo 的舊 tokenizers 版本。
+    """
+    if not REQ_FILE.exists():
+        return
+
+    try:
+        text = REQ_FILE.read_text(encoding="utf-8")
+    except Exception:
+        # 若讀取失敗就略過，維持上游原樣，避免阻斷安裝流程
+        return
+
+    original = text
+    text = text.replace("transformers==4.35.0", "transformers>=4.39.0")
+
+    if text != original:
+        try:
+            REQ_FILE.write_text(text, encoding="utf-8")
+            print("[INFO] Patched requirements.txt to use transformers>=4.39.0 instead of 4.35.0.")
+        except Exception:
+            # 寫入失敗時也不終止流程，只是保留原設定
+            print("[WARN] Failed to patch requirements.txt; using upstream transformers pin.")
+
+
 def main() -> int:
     if not REQ_FILE.exists():
         print(f"[ERROR] requirements.txt not found at {REQ_FILE}")
         return 1
+
+    # 先修正上游 requirements 中已知會造成安裝問題的版本限制
+    patch_requirements()
 
     # 若已經成功編譯並可匯入 torchmcubes，則跳過之後昂貴的 torch 重安裝步驟
     skip_torch_reinstall = False

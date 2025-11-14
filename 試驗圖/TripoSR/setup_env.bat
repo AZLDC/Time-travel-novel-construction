@@ -90,7 +90,7 @@ if not exist "%TRIPOSR_DIR%" (
 :: Install TripoSR dependencies via helper Python script (handles torch, transformers, requirements, gradio)
 pushd "%TRIPOSR_DIR%"
 echo [INFO] Installing TripoSR requirements via tr_setup_deps.py
-python "%PROJECT_DIR%tr_setup_deps.py"
+%PYTHON_CMD% "%PROJECT_DIR%tr_setup_deps.py"
 set "TR_DEPS_RC=%ERRORLEVEL%"
 popd
 

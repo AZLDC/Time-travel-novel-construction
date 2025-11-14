@@ -12,7 +12,7 @@ if not exist "%TRIPOSR_DIR%\gradio_app.py" (
 )
 
 pushd "%TRIPOSR_DIR%"
-python gradio_app.py
+python3 gradio_app.py
 set EXITCODE=%ERRORLEVEL%
 popd
 
