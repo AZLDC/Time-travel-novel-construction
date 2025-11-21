@@ -19,4 +19,3 @@ echo [INFO] Launching TripoSR Simple GUI...
 python3 "%SIMPLE_GUI%"
 
 exit /b %ERRORLEVEL%
-

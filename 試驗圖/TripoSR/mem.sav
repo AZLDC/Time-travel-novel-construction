@@ -1,6 +1,11 @@
 {
-  "input_path": "D:/interest/output/0/input.png",
-  "output_dir": "D:/interest/output",
-  "mc_resolution": 512,
-  "bake_texture": true
+  "input_path": "D:/interest/格物治世/試驗圖/input/1_front.jpg",
+  "output_dir": "D:/interest/格物治世/試驗圖/TripoSR/",
+  "mc_resolution": 96,
+  "bake_texture": false,
+  "chunk_size": 128,
+  "texture_resolution": 512,
+  "preview_delete": true,
+  "render": false,
+  "safe_mode": true
 }

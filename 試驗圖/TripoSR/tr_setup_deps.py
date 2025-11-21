@@ -12,13 +12,10 @@ from pathlib import Path
 PROJECT_DIR = Path(__file__).resolve().parent
 TRIPOSR_DIR = PROJECT_DIR / "vendor" / "TripoSR"
 REQ_FILE = TRIPOSR_DIR / "requirements.txt"
-TORCHMCUBES_MARKER = PROJECT_DIR / ".torchmcubes_built"
-
 
 def run(cmd: list[str]) -> int:
     """以目前 Python 進程執行子命令，直接轉印輸出。"""
     return subprocess.call(cmd)
-
 
 def patch_requirements() -> None:
     """調整上游 TripoSR 的 requirements.txt，避免不相容的版本限制。
@@ -56,11 +53,14 @@ def main() -> int:
     # 先修正上游 requirements 中已知會造成安裝問題的版本限制
     patch_requirements()
 
-    # 若已經成功編譯並可匯入 torchmcubes，則跳過之後昂貴的 torch 重安裝步驟
+    # 若目前環境已可匯入 torchmcubes，則跳過之後昂貴的 torch 重安裝步驟
     skip_torch_reinstall = False
-    if TORCHMCUBES_MARKER.exists():
+    try:
+        import torchmcubes  # type: ignore
         skip_torch_reinstall = True
-        print("[INFO] torchmcubes marker found; skipping torch CPU/CUDA reinstall steps.")
+        print("[INFO] torchmcubes already importable; skipping torch CPU/CUDA reinstall steps.")
+    except Exception:
+        print("[INFO] torchmcubes not importable yet; will run torch CPU/CUDA reinstall and build steps.")
 
     if not skip_torch_reinstall:
         # 先安裝 CPU 版 torch/vision/audio，避免 torchmcubes 受到 CUDA 版 torch 影響
@@ -96,12 +96,9 @@ def main() -> int:
         print("[ERROR] Failed to install TripoSR dependencies from requirements.txt.")
         return rc
 
-    # 若 torchmcubes 可成功匯入，寫入 marker 檔，避免之後重跑時一再重裝 torch
     try:
         import torchmcubes  # type: ignore
-
-        TORCHMCUBES_MARKER.write_text("ok", encoding="utf-8")
-        print("[INFO] torchmcubes import successful; marker file created.")
+        print("[INFO] torchmcubes import successful after installation.")
     except Exception:
         print("[WARN] torchmcubes import failed after installation; fallback implementation may be used.")
 
